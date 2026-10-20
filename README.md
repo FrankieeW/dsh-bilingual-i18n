@@ -1,7 +1,6 @@
 # dsh-bilingual-i18n —— DeepSeek Harness 中英双语界面
 
 [![npm version](https://img.shields.io/npm/v/dsh-bilingual-i18n.svg)](https://www.npmjs.com/package/dsh-bilingual-i18n)
-[![npm downloads](https://img.shields.io/npm/dm/dsh-bilingual-i18n.svg)](https://www.npmjs.com/package/dsh-bilingual-i18n)
 [![license](https://img.shields.io/npm/l/dsh-bilingual-i18n.svg)](LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-0.2.1--rc.2-4D6BFE.svg)](https://github.com/FrankieeW/dsh-bilingual-i18n)
 
