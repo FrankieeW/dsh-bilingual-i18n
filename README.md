@@ -42,39 +42,48 @@
 
 ### 桌面版
 
-桌面 profile 由 Electron 独占，`dsh plugin` 命令装不了，需要手动两步：
+桌面 profile 由 Electron 独占，`dsh plugin` 命令装不了。编辑
+`~/.dsh/profiles/desktop/package.json`：依赖里加上 `dsh-bilingual-i18n`，
+`dsh.profile.bundles` 里加上包名（只有进 bundles 才会激活）：
 
-1. 编辑 `~/.dsh/profiles/desktop/package.json`：依赖里加上软链，`dsh.profile.bundles` 里加上包名
-   （只有进 bundles 才会激活）：
+```json
+{
+  "dependencies": { "dsh-bilingual-i18n": "^0.2.0" },
+  "dsh": {
+    "profile": {
+      "bundles": ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app", "dsh-bilingual-i18n"]
+    }
+  }
+}
+```
 
-   ```json
-   {
-     "dependencies": { "dsh-bilingual-i18n": "link:/绝对路径/dsh-bilingual-i18n" },
-     "dsh": {
-       "profile": {
-         "bundles": ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app", "dsh-bilingual-i18n"]
-       }
-     }
-   }
-   ```
+然后用 **DSH 自带的 pnpm** 安装（系统里的 pnpm 版本不同，会改写 profile 的锁文件）：
 
-2. 用 **DSH 自带的 pnpm** 安装。系统里的 pnpm 版本不同，会改写 profile 的锁文件：
+```bash
+cd ~/.dsh/profiles/desktop
+node "$DSH_APP/Contents/Resources/runtime/primary-runtime/dependencies/pnpm/bin/pnpm.mjs" install --ignore-scripts
+```
 
-   ```bash
-   cd ~/.dsh/profiles/desktop
-   node "/Applications/Homebrew Casks/DeepSeek Harness.app/Contents/Resources/runtime/primary-runtime/dependencies/pnpm/bin/pnpm.mjs" install --ignore-scripts
-   ```
-
-重启 App，然后打开 **设置 → 通用 → 英文占比**。以软链安装时，改代码后重启 App 即生效。
+重启 App，然后打开 **设置 → 通用 → 英文占比**。
 
 ### Web 版（`dsh web`）
 
 ```bash
-dsh plugin --profile web add link:/绝对路径/dsh-bilingual-i18n
+dsh plugin --profile web add dsh-bilingual-i18n
 dsh --profile web --port 8080
 ```
 
 这条命令会同时写入依赖和 `dsh.profile.bundles`。
+
+### 从源码装（开发用）
+
+把上面的 `dsh-bilingual-i18n` 换成软链到本仓库即可，改代码后重启 App 即生效：
+
+```json
+"dependencies": { "dsh-bilingual-i18n": "link:/绝对路径/dsh-bilingual-i18n" }
+```
+
+Web 版同理：`dsh plugin --profile web add link:/绝对路径/dsh-bilingual-i18n`。
 
 ## 偏好保存在哪
 
@@ -98,7 +107,7 @@ dsh --profile web --port 8080
 ## 开发
 
 ```bash
-npm test            # 自测（85 项）
+npm test            # 自测（98 项）
 npm run calibrate   # 用本机 DSH 的真实词典标定各档占比、列出原子条目
 npm install         # 首次：装 playwright-core，只给端到端测试用
 npm run e2e         # 隔离的 dsh web + 无头 Chrome，在真实界面里走一遍，截图在 .e2e/shots/

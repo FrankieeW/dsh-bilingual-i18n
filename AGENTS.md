@@ -22,7 +22,7 @@ dsh-bilingual-i18n/
 ├── cordis.patch.yml         # DSH 挂载声明（insert，id 必须 = 包名）
 ├── lib/client.js            # 浏览器半侧：合成规则 → Proxy 词典 → 偏好 → 设置行 → apply
 ├── lib/index.js             # 宿主半侧：只声明 volatile Config { level, order }
-├── test/run-tests.mjs       # 自测 85 项：规则 / 偏好 / 设置行 / Config / 真实词典集成
+├── test/run-tests.mjs       # 自测 98 项：规则 / 偏好 / 设置行 / Config / 真实词典集成
 ├── test/support/            # asar 读取、真实 DSH 词典环境、插件加载与替身（脚本也复用）
 ├── scripts/calibrate.mjs    # 用本机真实词典标定各档占比、列原子条目、看单条结果
 ├── scripts/e2e.mjs          # 隔离的 dsh web + 无头 Chrome，在真实界面里走一遍
@@ -34,7 +34,7 @@ dsh-bilingual-i18n/
 ## Run & Verify Commands
 
 ```bash
-npm test                         # 85 项；第 4、5 组需要本机装有 DSH（读 app.asar，DSH_APP_ASAR 可改路径）
+npm test                         # 98 项；第 4、5 组需要本机装有 DSH（读 app.asar，DSH_APP_ASAR 可改路径）
 npm run calibrate                # 各档纯英文占比 + 英文词数分布
 npm run calibrate -- --atomic    # 列出全部原子条目，检查有没有误伤普通文案
 npm run calibrate -- --key chat:chat.deepDivingFor   # 某一条在 5 档下的结果
@@ -48,10 +48,10 @@ npm install && npm run e2e       # 真实界面端到端（11 项），截图在
 ```bash
 # 桌面 profile 由 Electron 独占，CLI 装不了 → 手改三处（与 dsh-quota-bridge 相同）：
 #   ~/.dsh/profiles/desktop/package.json
-#     dependencies["dsh-bilingual-i18n"] = "link:/Users/fwmbam4/CodeHub/Frankie/dsh-bilingual-i18n"
+#     dependencies["dsh-bilingual-i18n"] = "link:/绝对路径/dsh-bilingual-i18n"
 #     dsh.profile.bundles += "dsh-bilingual-i18n"
 #   ~/.dsh/profiles/desktop/pnpm-lock.yaml 里同名条目的 specifier / version
-#   ~/.dsh/profiles/desktop/node_modules/dsh-bilingual-i18n -> ../../../../CodeHub/Frankie/dsh-bilingual-i18n
+#   ~/.dsh/profiles/desktop/node_modules/dsh-bilingual-i18n -> 本包目录
 # 或者改完 package.json 后用 DSH 自带的 pnpm 重新 install：
 node "$DSH_APP/Contents/Resources/runtime/primary-runtime/dependencies/pnpm/bin/pnpm.mjs" install --ignore-scripts
 # 然后重启 DSH Desktop。web profile 可以直接：dsh plugin --profile web add link:<本目录>

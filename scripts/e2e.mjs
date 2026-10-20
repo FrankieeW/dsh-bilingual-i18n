@@ -90,9 +90,23 @@ async function startServer() {
 async function openSettings(page, url) {
 	await page.goto(url);
 	await page.getByText(/^(更多|More)$/).first().waitFor({ timeout: 60_000 });
-	// 新 DSH_HOME 第一次打开会弹「预览版说明」，它可能比侧栏晚一点出现
-	const notice = page.getByRole('button', { name: /^(继续|Continue)$/ }).first();
-	await notice.waitFor({ timeout: 3000 }).then(() => notice.click(), () => {});
+	// 全新的 DSH_HOME 首屏会弹好几层全屏遮罩：「预览版说明」、「等待登录」……
+	// 它们盖住整个视口（z-index 1000），侧栏底部的「更多」正好在下面，点不动。
+	// 能按文案点掉就点掉；点不掉（登录引导一直在）就把遮罩摘了 —— 这一步只想测插件。
+	const dismiss = /^(继续|取消|关闭|稍后|跳过|Continue|Cancel|Close|Skip|Later)$/;
+	for (let round = 0; round < 6; round++) {
+		const overlay = page.locator('[role=presentation]').filter({ has: page.locator('[class*="mask"]') }).last();
+		if (!(await overlay.isVisible().catch(() => false))) break;
+		const button = overlay.getByRole('button', { name: dismiss }).first();
+		await button.waitFor({ state: 'visible', timeout: 5_000 }).catch(() => {});
+		if (await button.isEnabled().catch(() => false)) {
+			await button.click({ timeout: 10_000 }).catch(() => {});
+			await page.waitForTimeout(500);
+			continue;
+		}
+		await overlay.evaluate((node) => node.remove());
+		await page.waitForTimeout(200);
+	}
 	await page.getByText(/^(更多|More)$/).first().click();
 	await page.getByRole('menuitem', { name: /设置|Settings/ }).first().click();
 	await page.locator('.dshb-row').waitFor();

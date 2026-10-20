@@ -77,12 +77,17 @@ const atomicCases = [
 	['reference.time.minutes', '{n}分钟', '{n}min', '单位缩写模板'],
 	['schedule.catalog.unit.minute.other', '分钟', 'minutes', 'unit 路径下的词'],
 	['conversation.detail.weekday.1', '周一', 'Mon', '星期名'],
-	['trajectory.request.retryProgress', '{retry}/{maximum}', '{retry} of {maximum}', '无中文的格式模板']
+	['trajectory.request.retryProgress', '{retry}/{maximum}', '{retry} of {maximum}', '无中文的格式模板'],
+	// 中文侧汉字 >1，不能只靠 hanCount <= 1 兜住：
+	['docs.helpUrl', 'https://api-docs.deepseek.com/zh-cn/guides/search', 'https://api-docs.deepseek.com/guides/search', '中文路径的 URL'],
+	['docs.relatedUrl', 'https://example.com/帮助/参考手册', 'https://example.com/help/reference-manual', '带中文路径的 URL']
 ];
 for (const [key, zh, en, label] of atomicCases) {
 	check(`原子条目（${label}）只能二选一，不并列`, isAtomic(key, zh, en) && composeEntry(key, zh, en, 1, 'zh-first') === zh && composeEntry(key, zh, en, 5, 'zh-first') === en, JSON.stringify(composeEntry(key, zh, en, 1, 'zh-first')));
 }
 check('普通文案不是原子条目', [cancel, newSession, ['models.deleteTitle', '删除 {provider}？', 'Delete {provider}?'], ['theme.title', '外观', 'Appearance']].every(([key, zh, en]) => !isAtomic(key, zh, en)));
+// URL 规则要窄：整条是地址才二选一，顺带提到地址的提示文案仍可并列
+check('提示文案里带地址的仍可并列（URL 规则不误伤）', !isAtomic('settings.webSearch.baseUrlHint', '配置搜索服务的 API 基地址，例如 https://api.example.com', 'Set the search service API base URL, e.g. https://api.example.com'));
 check('原子条目第 1 档用中文，到其词数对应的档位整体换成英文', at(1, ['time.locale', 'zh-CN', 'en']) === 'zh-CN' && at(2, ['time.locale', 'zh-CN', 'en']) === 'en');
 
 check('偏好校验：非法值回到默认', normalizePrefs({ level: 9, order: 'x' }).level === 1 && normalizePrefs({ level: 9, order: 'x' }).order === 'zh-first');
@@ -526,6 +531,27 @@ if (!asarAvailable) {
 	second.rows[0].entry.inject().selectLevel(1);
 	check('重新加载后照常工作', common('cancel') === `${zhCommon.cancel} ${enCommon.cancel}`, common('cancel'));
 	second.dispose();
+
+	// register 抛错不能掀翻整个插件：残留的注册（或同 id 的第二份副本）会让它抛，
+	// 但插件其余部分必须照常工作 —— 设置行仍注册，词典仍合成。
+	warnings.length = 0;
+	const realRegister = locale.register.bind(locale);
+	locale.register = (ns, ...rest) => {
+		if (ns === 'dsh.bilingual') throw new Error(`locale namespace "${ns}" already has locale "zh"`);
+		return realRegister(ns, ...rest);
+	};
+	const third = harness(undefined);
+	let threw = false;
+	try {
+		ourPlugin.apply(third.ctx);
+	} catch {
+		threw = true;
+	}
+	const degraded = third.rows.length > 0 && locale.getSnapshot().locales.some((item) => item.id === 'zh-en');
+	check('设置行词典注册抛错时插件不整体失效', !threw && degraded, threw ? 'apply 抛异常' : `rows=${third.rows.length}`);
+	check('注册失败只记一次告警', warnings.length === 1, warnings.join(' ｜ '));
+	third.dispose();
+	locale.register = realRegister;
 }
 
 console.log(`\n${failures === 0 ? '🎉 全部通过' : `⚠️  ${failures} 项失败`}\n`);
