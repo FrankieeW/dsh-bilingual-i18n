@@ -1,5 +1,10 @@
 # dsh-bilingual-i18n —— DeepSeek Harness 中英双语界面
 
+[![npm version](https://img.shields.io/npm/v/dsh-bilingual-i18n.svg)](https://www.npmjs.com/package/dsh-bilingual-i18n)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-bilingual-i18n.svg)](https://www.npmjs.com/package/dsh-bilingual-i18n)
+[![license](https://img.shields.io/npm/l/dsh-bilingual-i18n.svg)](LICENSE)
+[![DSH](https://img.shields.io/badge/DSH-0.2.1--rc.2-4D6BFE.svg)](https://github.com/FrankieeW/dsh-bilingual-i18n)
+
 **设置 → 通用 → 英文占比**：一个 5 档滑块，最左中英双语，最右纯英文。
 越往右，只显示英文的文案越多。切换顺序按英文的长短来：先是单个单词，再是短语、
 短句，最后整句都只剩英文。长句保留中文对照的时间最长。
