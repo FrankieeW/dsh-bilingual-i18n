@@ -1,0 +1,11 @@
+# dsh-bilingual-i18n 的 bundle patch —— 挂载声明
+#
+# 插件包只要声明 dsh.bundle.patch，DSH 启动时就会把这一层叠进配置树；
+# 因为 package.json 同时声明了 dsh.client，浏览器半侧会以
+# /plugins/dsh-bilingual-i18n/client.js 提供给页面。
+#
+# id 必须全局唯一且与包名一致（商城预检按 entryId 比对）。
+
+- insert:
+    - id: dsh-bilingual-i18n
+      name: 'dsh-bilingual-i18n'

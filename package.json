@@ -1,0 +1,68 @@
+{
+  "name": "dsh-bilingual-i18n",
+  "version": "0.2.0",
+  "description": "DeepSeek Harness 中英双语界面：「英文占比」5 档滑块，从中英并列逐步过渡到纯英文。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node test/run-tests.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "calibrate": "node scripts/calibrate.mjs"
+  },
+  "license": "MIT",
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "i18n",
+    "locale",
+    "bilingual"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrankieeW/dsh-bilingual-i18n.git"
+  },
+  "homepage": "https://github.com/FrankieeW/dsh-bilingual-i18n#readme",
+  "bugs": {
+    "url": "https://github.com/FrankieeW/dsh-bilingual-i18n/issues"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "^3.18.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "playwright-core": "^1.57.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ],
+      "platform": "web"
+    }
+  }
+}
